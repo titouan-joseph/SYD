@@ -36,7 +36,24 @@ ts.start().then(() => {
                 return ts.queryText(pdf).then((data) => {
                     // console.log(data)
                     let code = /CODE : ([^\n]*)/.exec(data)[1];
-                    console.log("Code :", code);
+                    let ects = /ECTS : ([^\n]*)/.exec(data)[1];
+                    let cours = /Cours : ([^\n]*)/.exec(data)[1];
+                    let TD = /TD : ([^\n]*)/.exec(data)[1];
+                    let TP = /TP : ([^\n]*)/.exec(data)[1];
+                    let Projet = /Projet : ([^\n]*)/.exec(data)[1];
+                    let travailPerso = /Travail personnel : ([^\n]*)/.exec(data)[1];
+
+                    pdfData = {
+                        "Code" :  code,
+                        "ects" :  ects,
+                        "cours" :  cours,
+                        "td" :  TD,
+                        "tp" :  TP,
+                        "projet" :  Projet,
+                        "travil perso" :  travailPerso
+                    }
+
+                    console.log(JSON.stringify(pdfData, null, 2))
                 });
             }
         })

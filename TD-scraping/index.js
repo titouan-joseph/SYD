@@ -51,6 +51,7 @@ ts.start().then(() => {
   const listeUrlPdfs = [
     'http://planete.insa-lyon.fr/scolpeda/f/ects?id=36736&_lang=fr'
   ]
+  // const listeUrlPdfs = extractUrlPdfs('https://cours.reimert.fr/formation-insa.html')
   // Pour chaque url ...
   return Promise.all(listeUrlPdfs.map((url) => {
     // Extraction du texte.
@@ -60,7 +61,26 @@ ts.start().then(() => {
         return ts.queryText(pdf).then((data) => {
           // console.log(data)
           let code = /CODE : ([^\n]*)/.exec(data)[1];
-          // console.log("Code :", code);
+          let ects = /ECTS : ([^\n]*)/.exec(data)[1];
+          let cours = /Cours : ([^\n]*)/.exec(data)[1];
+          let TD = /TD : ([^\n]*)/.exec(data)[1];
+          let TP = /TP : ([^\n]*)/.exec(data)[1];
+          let Projet = /Projet : ([^\n]*)/.exec(data)[1];
+          let travailPerso = /Travail personnel : ([^\n]*)/.exec(data)[1];
+
+          let pdfData = {
+            "Code" :  code,
+            "ects" :  ects,
+            "cours" :  cours,
+            "td" :  TD,
+            "tp" :  TP,
+            "projet" :  Projet,
+            "travil perso" :  travailPerso
+          }
+
+          db.put(url, pdfData)
+
+
         });
       }
     })
@@ -85,17 +105,17 @@ const extractUrlPdfs = (url) => {
   })
 }
 
-extractUrlPdfs('https://www.insa-lyon.fr/fr/formation/parcours/729/4/1') // .then(console.log)
+// extractUrlPdfs('https://cours.reimert.fr/formation-insa.html') // .then(console.log)
 
 // Créer une base de données
 const db = {}
 
 // Écrire dans la base de données
 
-db["code"] = {
-  a: 1,
-  b: 2
-}
+// db["code"] = {
+//   a: 1,
+//   b: 2
+// }
 
 // Afficher le contenu d'une variable en json
-console.log(JSON.stringify(db, null, 2));
+// console.log(JSON.stringify(db, null, 2));
