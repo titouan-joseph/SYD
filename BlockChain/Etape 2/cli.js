@@ -51,7 +51,10 @@ socket.on('connect', () => {
       });
       break;
     case 'keys':
-      console.error("J'ai oublié celle-là '-_-'");
+      socket.emit('keys', (keys) => {
+        console.log(`keys : ${keys}`);
+        socket.close();
+      })
       break;
     default:
       console.error("Commande inconnue");
