@@ -4,18 +4,19 @@ const argv = require('yargs') // Analyse des paramètres
   .command('get <key>', 'Récupère la valeur associé à la clé')
   .command('set <key> <value>', 'Place une association clé / valeur')
   .command('keys', 'Demande la liste des clés')
-  .option('url', {
-    alias: 'u',
-    default: 'http://localhost:3000',
-    description: 'Url du serveur à contacter'
+  .option('port', {
+    alias: 'p',
+    default: '3000',
+    description: 'Port du server a contacter'
   })
   .demandCommand(1, 'Vous devez indiquer une commande')
   .help()
   .argv;
 
+const url = `http://localhost:${argv.port}`;
 const io = require('socket.io-client');
 
-const socket = io(argv.url, {
+const socket = io(url, {
   path: '/byr',
 });
 
@@ -56,8 +57,19 @@ socket.on('connect', () => {
         socket.close();
       })
       break;
+    case 'addPeer':
+      socket.emit('addPeer',argv._[1],argv._[2] , (keys) => {
+        console.log(`addPeer : ${keys}`);
+        socket.close();
+      })
+    case 'peers':
+      socket.emit('peers', (keys) => {
+        console.log(`keys : ${keys}`);
+        socket.close();
+      })
     default:
       console.error("Commande inconnue");
       socket.close();
+      socket.io.uri
   }
 });

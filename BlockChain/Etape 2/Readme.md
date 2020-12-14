@@ -127,3 +127,4 @@ Pour continuer à lire le sujet :
 Pour continuer cette étape, vous pouvez essayer de discuter avec vos camarades pour étendre le système entre plusieurs machines.
 
 Vous pouvez mettre en place des backups sur disque de la base de données.
+
