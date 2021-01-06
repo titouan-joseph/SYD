@@ -44,9 +44,9 @@ io.on('connect', (socket) => { // Pour chaque nouvlle connexion
   });
 
   socket.on('set', function(field, value, callback, timestamp=null){
-    setTimeout(() => {
-      // Le code ici sera exécuté après 10 secondes.
-    }, 10000);
+    // setTimeout(() => {
+    //   // Le code ici sera exécuté après 10 secondes.
+    // }, 10000);
     if (field in db) {
       console.info(`set error : Field ${field} already exists.`);
       if( timestamp < db[field].timestamp && timestamp != null ){ 
@@ -69,6 +69,7 @@ io.on('connect', (socket) => { // Pour chaque nouvlle connexion
         });
       })
     }
+    // callback(false);
   });
 
   socket.on('keys', function(callback){
@@ -76,6 +77,11 @@ io.on('connect', (socket) => { // Pour chaque nouvlle connexion
     callback(Object.keys(db));
   });
 
+  socket.on('keysAndTime', function(callback){
+    console.info(`keys and time`);
+    callback(extractHorodatage(db))
+  });
+  
   socket.on('addPeer', function(serverAddr, port, callback){
     console.info(`Adding peer ${serverAddr}:${port}`)
 
@@ -93,7 +99,17 @@ io.on('connect', (socket) => { // Pour chaque nouvlle connexion
   socket.on('peers', function(){
     otherSockets.forEach(sock => {
       port = sock.io.uri.match(new RegExp(/:[0-9]+/));
-      address = sock.io.uri.match(new RegExp(/az/));
+      address = sock.io.uri.match(new RegExp(/:\/\/[a-z]+/));
+      console.log(`port ${port} on ${address}`);
     })
   })
 });
+
+const extractHorodatage = function(db) {
+  return Object.keys(db).reduce(function(result, key) {
+    result[key] = {
+      timestamp: db[key].timestamp
+    };
+    return result;
+  }, {});
+};

@@ -62,11 +62,19 @@ socket.on('connect', () => {
         console.log(`addPeer : ${keys}`);
         socket.close();
       })
+      break;
     case 'peers':
       socket.emit('peers', (keys) => {
         console.log(`keys : ${keys}`);
         socket.close();
       })
+      break;
+    case 'keysAndTime':
+      socket.emit('keysAndTime', (keysAndTime) => {
+        console.log("Keys and time : ", keysAndTime);
+        socket.close();
+      })
+      break;
     default:
       console.error("Commande inconnue");
       socket.close();
