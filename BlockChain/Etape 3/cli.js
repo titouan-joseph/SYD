@@ -64,8 +64,8 @@ socket.on('connect', () => {
       })
       break;
     case 'peers':
-      socket.emit('peers', (keys) => {
-        console.log(`keys : ${keys}`);
+      socket.emit('peers', (address, port) => {
+        console.log(`address : ${address} port: ${port}`);
         socket.close();
       })
       break;

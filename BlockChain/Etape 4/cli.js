@@ -1,21 +1,23 @@
 #!/usr/bin/env node
 
+const crypto = require('crypto');
 const argv = require('yargs') // Analyse des paramètres
   .command('get <key>', 'Récupère la valeur associé à la clé')
   .command('set <key> <value>', 'Place une association clé / valeur')
   .command('keys', 'Demande la liste des clés')
-  .option('url', {
-    alias: 'u',
-    default: 'http://localhost:3000',
-    description: 'Url du serveur à contacter'
+  .option('port', {
+    alias: 'p',
+    default: '3000',
+    description: 'Port du server a contacter'
   })
   .demandCommand(1, 'Vous devez indiquer une commande')
   .help()
   .argv;
 
+const url = `http://localhost:${argv.port}`;
 const io = require('socket.io-client');
 
-const socket = io(argv.url, {
+const socket = io(url, {
   path: '/byr',
 });
 
@@ -39,22 +41,63 @@ socket.on('connect', () => {
 
   switch (argv._[0]) {
     case 'get':
-      socket.emit('get', argv.key, (value) => {
-        console.info(`get ${argv.key} : ${value}`);
+      socket.emit('get', argv.key, (dick) => {
+        console.info(`get ${argv.key} : ${dick.value} at ${dick.timestamp}`);
         socket.close();
       });
       break;
     case 'set':
-      socket.emit('set', argv.key, argv.value, (ok) => {
+      let magicalNumber = 0;
+      let isHeadZero = false;
+      while(!isHeadZero){
+        var hash = getHash(`${argv.key}${argv.value}${magicalNumber}`)
+        if(hash[0] == 0){
+          isHeadZero = true; 
+        } else {
+          magicalNumber++;
+        }
+      }
+      socket.emit('set', argv.key, argv.value, hash, (ok) => {
         console.info(`set ${argv.key} : ${ok}`);
+        
+        
         socket.close();
       });
       break;
     case 'keys':
-      console.error("J'ai oublié celle-là '-_-'");
+      socket.emit('keys', (keys) => {
+        console.log(`keys : ${keys}`);
+        socket.close();
+      }) 
+      break;
+    case 'addPeer':
+      socket.emit('addPeer',argv._[1],argv._[2] , (keys) => {
+        console.log(`addPeer : ${keys}`);
+        socket.close();
+      })
+      break;
+    case 'peers':
+      socket.emit('peers', (address, port) => {
+        console.log(`address : ${address} port: ${port}`);
+        socket.close();
+      })
+      break;
+    case 'keysAndTime':
+      socket.emit('keysAndTime', (keysAndTime) => {
+        console.log("Keys and time : ", keysAndTime);
+        socket.close();
+      })
       break;
     default:
       console.error("Commande inconnue");
       socket.close();
+      socket.io.uri
   }
 });
+
+
+// Retourne l'empreinte de data.
+const getHash = function getHash(data) {
+  return crypto.createHash('sha256').update(data, 'utf8').digest('hex');
+
+}
